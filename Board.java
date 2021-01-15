@@ -8,16 +8,18 @@ public class Board {
     // this will be modified continuously throughout the game as the player/AI hits or misses
     char[][] display;
 
+    int boardSize = 10;
+
     public Board() {
 
-        data = new boolean[8][8];
+        data = new boolean[boardSize][boardSize];
 
-        display = new char[8][8];
+        display = new char[boardSize][boardSize];
 
         // fills data and display with blank spaces, prior to ship placement
-        for(int i = 0; i < data.length; i++) {
+        for(int i = 0; i < boardSize; i++) {
 
-            for(int j = 0; j < data[i].length; j++) {
+            for(int j = 0; j < boardSize; j++) {
 
                 data[i][j] = false;
 
@@ -143,18 +145,28 @@ public class Board {
     // prints display for viewing by player
     public void printBoard() {
 
-        String[] rows = new String[8];
+        String topString = "   ";
+
+        for(int i = 0; i < boardSize; i++) {
+
+            topString = topString + (i + 1) + "  ";
+
+        }
+
+        System.out.println(topString);
+
+        String[] rows = new String[boardSize];
 
         // loop through all the rows
-        for(int i = 0; i < rows.length; i++) {
+        for(int i = 0; i < boardSize; i++) {
 
             // create seed string
-            String row = "";
+            String row = "" + Game.numToCha(i) + "  ";
 
             // loop through characters in current row, adding them to the seed string, spaced apart by one space
-            for(int j = 0; j < display[i].length; j++) {
+            for(int j = 0; j < boardSize; j++) {
 
-                row = row + display[i][j] + " ";
+                row = row + display[i][j] + "  ";
 
             }
 
@@ -164,7 +176,7 @@ public class Board {
         }
 
         // print out all the rows
-        for(int i = 0; i < rows.length; i++) {
+        for(int i = 0; i < boardSize; i++) {
 
             System.out.println(rows[i]);
 
@@ -179,9 +191,9 @@ public class Board {
         int hits = 0;
 
         // loop through arrays
-        for(int i = 0; i < data.length; i++) {
+        for(int i = 0; i < boardSize; i++) {
 
-            for(int j = 0; j < data[i].length; j++) {
+            for(int j = 0; j < boardSize; j++) {
 
                 // if data is true at space, there's a ship there
                 if(data[i][j]) {
@@ -232,9 +244,9 @@ public class Board {
 
         boolean inBounds = false;
 
-        if((row < 8) && (row > -1)) {
+        if((row < boardSize) && (row > -1)) {
 
-            if((column < 8) && (column > -1)) {
+            if((column < boardSize) && (column > -1)) {
 
                 inBounds = true;
 
@@ -249,17 +261,17 @@ public class Board {
     // debug only function for veiwing data array directly
     public void printTrueBoard() {
 
-        String[] rows = new String[8];
+        String[] rows = new String[boardSize];
 
         // loop throught all the rows
-        for(int i = 0; i < rows.length; i++) {
+        for(int i = 0; i < boardSize; i++) {
 
             // create seed string
             String row = "";
 
             // loop through data array, adding X or O to seed string depending on wether space is occupied
             // with space to seperate
-            for(int j = 0; j < data[i].length; j++) {
+            for(int j = 0; j < boardSize; j++) {
 
                 row = row + (data[i][j] ? 'X' : 'O') + " ";
 
@@ -271,7 +283,7 @@ public class Board {
         }
 
         // print out all the rows
-        for(int i = 0; i < rows.length; i++) {
+        for(int i = 0; i < boardSize; i++) {
 
             System.out.println(rows[i]);
 
@@ -296,14 +308,14 @@ public class Board {
     // does what it says on the tin
     public void reset() {
 
-        data = new boolean[8][8];
+        data = new boolean[boardSize][boardSize];
 
-        display = new char[8][8];
+        display = new char[boardSize][boardSize];
 
         // fills data and display with blank spaces, prior to ship placement
-        for(int i = 0; i < data.length; i++) {
+        for(int i = 0; i < boardSize; i++) {
 
-            for(int j = 0; j < data[i].length; j++) {
+            for(int j = 0; j < boardSize; j++) {
 
                 data[i][j] = false;
 

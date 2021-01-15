@@ -24,27 +24,31 @@ public class Game {
 
             board.printBoard();
 
-            System.out.println("Input your move in the format: row,column");
+            System.out.println("Input your move");
 
             String rawInput = input.nextLine();
 
             // check that input format is correct, after this loop, the input is definitely a correctly formatted move
             while(!isValidInput(rawInput)) {
 
-                System.out.println("Invalid, please input your move in the format: row,column");
+                System.out.println("Invalid format, please input your move");
 
                 rawInput = input.nextLine();
 
             }
 
             // split the string
-            String[] numStrings = rawInput.split(",");
+            String[] splitStrings = rawInput.split("");
 
-            // convert the strings to numbers
-            int[] coordinates = {Integer.parseInt(numStrings[0]), Integer.parseInt(numStrings[1])};
+            // convert the strings to numbers and characters;
+            char row = splitStrings[0].charAt(0);
+
+            String numString = splitStrings[1] + ((splitStrings.length == 3) ? splitStrings[2]:"");
+
+            int column = Integer.parseInt(numString);
 
             // check that the move is valid, and once it is, play it
-            while(!board.play(coordinates[0], coordinates[1])) {
+            while(!board.play(charToNum(row), column - 1)) {
 
                 System.out.println("Invalid, your move was either out of bounds or already played, choose again");
 
@@ -59,10 +63,12 @@ public class Game {
     
                 }
 
-                numStrings = rawInput.split(",");
+                splitStrings = rawInput.split("");
 
-                coordinates[0] = Integer.parseInt(numStrings[0]);
-                coordinates[1] = Integer.parseInt(numStrings[1]);
+                row = splitStrings[0].charAt(0);
+                numString = splitStrings[1] + ((splitStrings.length == 3) ? splitStrings[2]:"");
+
+                column = Integer.parseInt(numString);
 
             }
 
@@ -76,22 +82,43 @@ public class Game {
 
     public boolean isValidInput(String input) {
 
+        input = input.toLowerCase();
+
         boolean isValid = false;
 
-        if(input.length() == 3) {
+        // for if the input is like a1
+        if(input.length() == 2) {
 
-            if(input.charAt(1) == ',') {
+            String[] splitStrings = input.split("");
 
-                String[] numStrings = input.split(",");
+            if(isLetter(splitStrings[0].charAt(0))) {
 
                 try {
 
-                    int num1 = Integer.parseInt(numStrings[0]);
-                    int num2 = Integer.parseInt(numStrings[1]);
+                    int num = Integer.parseInt(splitStrings[1]);
 
                     isValid = true;
 
-                } catch(Exception e) {}
+                } catch (Exception e) {}
+
+            }
+
+        }
+
+        // for if the input is like a10
+        if(input.length() == 3) {
+
+            String numString = "" + (char)input.charAt(1) + (char)input.charAt(2);
+
+            if(isLetter(input.charAt(0))) {
+
+                try {
+
+                    int num = Integer.parseInt(numString);
+
+                    isValid = true;
+
+                } catch (Exception e) {}
 
             }
 
@@ -116,8 +143,8 @@ public class Game {
 
                 boolean isVertical = randomizer.nextInt(2) == 0;
 
-                int row = randomizer.nextInt(8);
-                int column = randomizer.nextInt(8);
+                int row = randomizer.nextInt(board.boardSize);
+                int column = randomizer.nextInt(board.boardSize);
 
                 while(!board.placeShip(lengths[i], isVertical, row, column)) {
 
@@ -133,6 +160,48 @@ public class Game {
             }
 
         }
+
+    }
+
+    public boolean isLetter(char cha) {
+
+        char[] letters = new char[board.boardSize];
+
+        for(int i = 0; i < board.boardSize; i++) {
+
+            letters[i] = numToCha(i);
+
+        }
+
+        boolean isLetter = false;
+
+        for(int i = 0; i < letters.length; i++) {
+
+            if (cha == letters[i]) {
+
+                isLetter = true;
+
+            }
+
+        }
+
+        return isLetter;
+
+    }
+
+    public static int charToNum(char cha) {
+
+        int num = (int)(cha) - 97;
+
+        return num;
+
+    }
+
+    public static char numToCha(int num) {
+
+        char cha = (char)(num + 97);
+
+        return cha;
 
     }
 
