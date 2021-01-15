@@ -29,6 +29,31 @@ public class Board {
 
     }
 
+    public boolean isValidGuess(int x, int y) {
+
+        isValid = false;
+
+        // check if space is within x bound
+        if(x < 9) {
+
+            // check if space is within y bound
+            if(y < 9) {
+
+                // check that the space hasn't been guessed already
+                if(display[x][y] == '~') {
+
+                    isValid = true;
+
+                }
+
+            }
+
+        }
+
+        return isValid;
+
+    }
+
     // does what it says on the tin
     public void reset() {
 
