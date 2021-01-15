@@ -30,11 +30,11 @@ public class Board {
     }
 
     // function for adding ship to the board, length is length of the ship, isVeritcal is wether it is oriented vertically
-    // x and y are start coordinates, which should be the leftmost or topmost point of the ship, depending on if it's vertical or not
+    // row and column are start coordinates, which should be the leftmost or topmost point of the ship, depending on if it's vertical or not
     // if isVertical is true, the ship is built downwards from there,
     // if isVertical is false then the ship is built to the right from there
     // returns true if placement succeeded without issue, false otherwise
-    public boolean placeShip(int length, boolean isVertical, int x, int y) {
+    public boolean placeShip(int length, boolean isVertical, int row, int column) {
 
         // boolean to return at end of function, will be made true if successful
         boolean success = false;
@@ -47,13 +47,13 @@ public class Board {
 
             if(isVertical) {
 
-                plannedSpaces[i][0] = x;
-                plannedSpaces[i][1] = y + i;
+                plannedSpaces[i][0] = row + i;
+                plannedSpaces[i][1] = column;
 
             } else {
 
-                plannedSpaces[i][0] = x + i;
-                plannedSpaces[i][1] = y;
+                plannedSpaces[i][0] = row;
+                plannedSpaces[i][1] = column + i;
 
             }
 
@@ -71,11 +71,15 @@ public class Board {
             if(checkBounds(currentX, currentY)) {
 
                 // check that the space is false (unoccupied) in data array
-                if(!data[currentX][currentY]) {
+                try {
 
-                    numOfValidSpaces++;
+                    if(!data[currentX][currentY]) {
 
-                }
+                        numOfValidSpaces++;
+    
+                    }
+
+                } catch(Exception e) {}
 
             }
 
@@ -102,15 +106,15 @@ public class Board {
     }
 
     // checks if the given guess is a valid space for the player to guess
-    public boolean isValidGuess(int x, int y) {
+    public boolean isValidGuess(int row, int column) {
 
         boolean isValid = false;
 
         // checks if the guess is in bounds
-        if(checkBounds(x, y)) {
+        if(checkBounds(row, column)) {
 
-            // checks if the guess is an unKnown space
-            if(display[x][y] == '~') {
+            // checks if the guess is an unknown space
+            if(display[row][column] == '~') {
 
                 isValid = true;
 
@@ -123,13 +127,13 @@ public class Board {
     }
 
     // checks if coordinates given are within the board;
-    public boolean checkBounds(int x, int y) {
+    public boolean checkBounds(int row, int column) {
 
         boolean inBounds = false;
 
-        if((x < 9) && (x > -1)) {
+        if((row < 9) && (row > -1)) {
 
-            if((y < 9) && (y > -1)) {
+            if((column < 9) && (column > -1)) {
 
                 inBounds = true;
 
@@ -182,6 +186,39 @@ public class Board {
             }
 
             // put completed string in array
+            rows[i] = row;
+
+        }
+
+        // print out all the rows
+        for(int i = 0; i < rows.length; i++) {
+
+            System.out.println(rows[i]);
+
+        }
+
+    }
+
+    // debug only function for veiwing data array directly
+    public void printTrueBoard() {
+
+        String[] rows = new String[8];
+
+        // loop throught all the rows
+        for(int i = 0; i < rows.length; i++) {
+
+            // create seed string
+            String row = "";
+
+            // loop through data array, adding X or O to seed string depending on wether space is occupied
+            // with space to seperate
+            for(int j = 0; j < data[i].length; j++) {
+
+                row = row + (data[i][j] ? 'X' : 'O') + " ";
+
+            }
+
+            // add completed string to array
             rows[i] = row;
 
         }
