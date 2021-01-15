@@ -86,8 +86,12 @@ public class Board {
         }
 
         // if these two are equal, then the ship is valid and can be placed
-        if(numOfValidSpaces == length) {
+        boolean isValid = numOfValidSpaces == length;
 
+        // final check for validity of move
+        if(isValid) {
+
+            // if the move is valid, then place the ship
             for(int i = 0; i < length; i++) {
 
                 int currentX = plannedSpaces[i][0];
@@ -97,73 +101,42 @@ public class Board {
 
             }
 
-        }
+            // ship has successfully been placed in valid squares
+            success = true;
 
-        success = (numOfValidSpaces == length);
+        }
 
         return success;
 
     }
 
-    // checks if the given guess is a valid space for the player to guess
-    public boolean isValidGuess(int row, int column) {
+    public boolean play(int row, int column) {
 
-        boolean isValid = false;
+        boolean success = false;
 
-        // checks if the guess is in bounds
-        if(checkBounds(row, column)) {
+        boolean isValid = isValidGuess(row, column);
 
-            // checks if the guess is an unknown space
-            if(display[row][column] == '~') {
+        // if the move is valid, make it
+        if(isValid) {
 
-                isValid = true;
+            // if data is true at the space, it's a hit, update the board accordingly
+            // otherwise it's a miss, update the board accordingly
+            if(data[row][column]) {
 
-            }
+                display[row][column] = 'X';
 
-        }
+            } else {
 
-        return isValid;
-
-    }
-
-    // checks if coordinates given are within the board;
-    public boolean checkBounds(int row, int column) {
-
-        boolean inBounds = false;
-
-        if((row < 9) && (row > -1)) {
-
-            if((column < 9) && (column > -1)) {
-
-                inBounds = true;
+                display[row][column] = ' ';
 
             }
 
-        }
-
-        return inBounds;
-
-    }
-
-    // does what it says on the tin
-    public void reset() {
-
-        data = new boolean[8][8];
-
-        display = new char[8][8];
-
-        // fills data and display with blank spaces, prior to ship placement
-        for(int i = 0; i < data.length; i++) {
-
-            for(int j = 0; j < data[i].length; j++) {
-
-                data[i][j] = false;
-
-                display[i][j] = '~';
-
-            }
+            // move was made successfully
+            success = true;
 
         }
+
+        return success;
 
     }
 
@@ -199,6 +172,80 @@ public class Board {
 
     }
 
+    public boolean detectVictory() {
+
+        int shipSpaces = 0;
+
+        int hits = 0;
+
+        // loop through arrays
+        for(int i = 0; i < data.length; i++) {
+
+            for(int j = 0; j < data[i].length; j++) {
+
+                // if data is true at space, there's a ship there
+                if(data[i][j]) {
+
+                    shipSpaces++;
+
+                }
+
+                // if display has an X at that space, the player has hit it
+                if(display[i][j] == 'X') {
+
+                    hits++;
+
+                }
+
+            }
+
+        }
+
+        // if the number of spaces with ships is the same as the number of hits, the player has sunk all ships and won
+        return shipSpaces == hits;
+
+    }
+
+    // checks if the given guess is a valid space for the player to guess
+    public boolean isValidGuess(int row, int column) {
+
+        boolean isValid = false;
+
+        // checks if the guess is in bounds
+        if(checkBounds(row, column)) {
+
+            // checks if the guess is an unknown space
+            if(display[row][column] == '~') {
+
+                isValid = true;
+
+            }
+
+        }
+
+        return isValid;
+
+    }
+
+    // checks if coordinates given are within the board;
+    public boolean checkBounds(int row, int column) {
+
+        boolean inBounds = false;
+
+        if((row < 8) && (row > -1)) {
+
+            if((column < 8) && (column > -1)) {
+
+                inBounds = true;
+
+            }
+
+        }
+
+        return inBounds;
+
+    }
+
     // debug only function for veiwing data array directly
     public void printTrueBoard() {
 
@@ -227,6 +274,42 @@ public class Board {
         for(int i = 0; i < rows.length; i++) {
 
             System.out.println(rows[i]);
+
+        }
+
+    }
+
+    // does what it says on the tin
+    public boolean[][] getData() {
+
+        return data;
+
+    }
+
+    // does what it says on the tin
+    public char[][] getDisplay() {
+
+        return display;
+
+    }
+
+    // does what it says on the tin
+    public void reset() {
+
+        data = new boolean[8][8];
+
+        display = new char[8][8];
+
+        // fills data and display with blank spaces, prior to ship placement
+        for(int i = 0; i < data.length; i++) {
+
+            for(int j = 0; j < data[i].length; j++) {
+
+                data[i][j] = false;
+
+                display[i][j] = '~';
+
+            }
 
         }
 
