@@ -4,9 +4,9 @@ public class AI {
 
     Random randomizer = new Random();
     
-    int unknownWeight = 1;
-    int hitWieght = 3;
-    int missWieght = 0;
+    int unknownWeight = 2;
+    int hitWieght = 5;
+    int missWieght = 1;
 
     // blank constructor
     public AI() {}
@@ -103,10 +103,12 @@ public class AI {
 
                     scoreBoard[row][column] = 0;
 
+                } else {
+
+                    scoreBoard[row][column] = rowScores[row] + columnScores[column];
+
                 }
                 
-                scoreBoard[row][column] = rowScores[row] + columnScores[column];
-
             }
 
         }
@@ -220,7 +222,11 @@ public class AI {
             // with space to seperate
             for(int j = 0; j < Board.boardSize; j++) {
 
-                row = row + scoreBoard[i][j] + " ";
+                String scoreString = "" + scoreBoard[i ][j];
+
+                scoreString = scoreString + ((scoreString.length() == 1) ? " " : "");
+
+                row = row + scoreString + " ";
 
             }
 
