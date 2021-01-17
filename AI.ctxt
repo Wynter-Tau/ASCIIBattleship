@@ -1,0 +1,13 @@
+#BlueJ class context
+comment0.target=AI
+comment1.params=
+comment1.target=AI()
+comment2.params=boardObject
+comment2.target=int[]\ findMove(Board)
+comment3.params=board
+comment3.target=int[]\ getRowScores(char[][])
+comment4.params=board
+comment4.target=int[]\ getColumnScores(char[][])
+comment5.params=scores
+comment5.target=int[]\ findHighestScoringIndexes(int[])
+numComments=6

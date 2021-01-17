@@ -8,7 +8,7 @@ public class Board {
     // this will be modified continuously throughout the game as the player/AI hits or misses
     char[][] display;
 
-    int boardSize = 10;
+    public static int boardSize = 10;
 
     public Board() {
 
