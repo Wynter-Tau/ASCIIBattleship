@@ -33,18 +33,11 @@ public class Game {
 
             AIBoard.play(AIMove[0], AIMove[1]);
 
+            AIPlayer.updateScoreBoard(AIMove, AIBoard);
+
             System.out.println("AI played at: " + numToCha(AIMove[0]) + (AIMove[1] + 1) + "\nAI Board:");
 
             AIBoard.printBoard();
-
-            //debug line
-            System.out.println();
-
-            // debugg line
-            AIPlayer.printScoreBoard(AIPlayer.getScoreBoard(AIBoard));
-
-            //debug line
-            System.out.println();
 
             System.out.println("\nYour Board: ");
 

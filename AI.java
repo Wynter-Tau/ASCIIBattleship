@@ -4,27 +4,43 @@ public class AI {
 
     Random randomizer = new Random();
     
-    int unknownWeight = 2;
-    int hitWieght = 5;
-    int missWieght = 1;
+    // increase in weight to squares around a hit
+    int hitWieght = 1;
 
-    // blank constructor
-    public AI() {}
+    // decrease in wieght to squares around a miss
+    int missWieght = 0;
+
+    // start value of a square
+    int startValue = 1;
+
+    int boardSize = Board.boardSize;
+
+    int[][] scoreBoard = new int[boardSize][boardSize];
+
+    // set up scoreBoard
+    public AI() {
+
+        for(int row = 0; row < boardSize; row++) {
+
+            for(int column = 0; column < boardSize; column++) {
+
+                scoreBoard[row][column] = startValue;
+
+            }
+
+        }
+
+    }
 
     // look through all the rows and columns of the board to find the space with the best chance of hitting
     public int[] findMove(Board boardObject) {
 
-        // store board that the AI should be able to actually see
-        char[][] board = boardObject.getDisplay();
-
-        int[][] scoreBoard = getScoreBoard(boardObject);
-
         // find highest score
         int highscore = -1;
 
-        for(int row = 0; row < Board.boardSize; row++) {
+        for(int row = 0; row < boardSize; row++) {
 
-            for(int column = 0; column < Board.boardSize; column++) {
+            for(int column = 0; column < boardSize; column++) {
 
                 if((scoreBoard[row][column] > highscore) && (boardObject.isValidGuess(row, column))) {
 
@@ -39,9 +55,9 @@ public class AI {
         // count number of high scores from valid spaces
         int highscoreCount = 0;
 
-        for(int row = 0; row < Board.boardSize; row++) {
+        for(int row = 0; row < boardSize; row++) {
 
-            for(int column = 0; column < Board.boardSize; column++) {
+            for(int column = 0; column < boardSize; column++) {
 
                 if(scoreBoard[row][column] == highscore && (boardObject.isValidGuess(row, column))) {
 
@@ -60,9 +76,9 @@ public class AI {
         int secondaryCounter = 0;
 
         // find all of the best moves, excluding the invalid ones
-        for(int row = 0; row < Board.boardSize; row++) {
+        for(int row = 0; row < boardSize; row++) {
 
-            for(int column = 0; column < Board.boardSize; column++) {
+            for(int column = 0; column < boardSize; column++) {
 
                 if((scoreBoard[row][column] == highscore) && (boardObject.isValidGuess(row, column))) {
 
@@ -84,143 +100,79 @@ public class AI {
 
     }
 
-    public int[][] getScoreBoard(Board boardObject) {
+    public void updateScoreBoard(int[] move, Board boardObject) {
 
-        char[][] board = boardObject.getDisplay();    
-        
-        int[] rowScores = getRowScores(board);
-        int[] columnScores = getColumnScores(board);
+        int row = move[0];
+        int column = move[1];
 
-        // grid of scores for later use
-        int[][] scoreBoard = new int[Board.boardSize][Board.boardSize];
+        char[][] board = boardObject.getDisplay();
 
-        // fill scoreBoard with scores of each square
-        for(int row = 0; row < Board.boardSize; row++) {
+        // weight to place on spaces surrounding the given move
+        int weight = charToWeight(board[row][column]);
 
-            for(int column = 0; column < Board.boardSize; column++) {
+        // all the surrounding spaces
+        int[] upSpace = {row - 1, column};
+        int[] downSpace = {row + 1, column};
+        int[] rightSpace = {row, column - 1};
+        int[] leftSpace = {row, column + 1};
 
-                if(!boardObject.isValidGuess(row, column)) {
+        int[][] spacesToUpdate = {upSpace, downSpace, rightSpace, leftSpace};
 
-                    scoreBoard[row][column] = 0;
+        // loop throught the surrounding spaces, and if they are in bounds, and not played on yet, update them
+        for(int i = 0; i < 4; i++) {
 
-                } else {
+            int[] coordinates = spacesToUpdate[i];
 
-                    scoreBoard[row][column] = rowScores[row] + columnScores[column];
+            if(boardObject.isValidGuess(coordinates[0], coordinates[1])) {
 
-                }
-                
+                scoreBoard[coordinates[0]][coordinates[1]] += weight;
+
             }
 
         }
-        
-        return scoreBoard;
+
+        scoreBoard[row][column] = 0;
 
     }
 
-    // get the scores of all the rows,
-    public int[] getRowScores(char[][] board) {
+    public int charToWeight(char cha) {
 
-        // score of the row currently be checked
-        int currentRowScore = 0;
+        int weight = 0;
 
-        // list of the row's scores
-        int[] rowScores = new int[Board.boardSize];
+        switch(cha) {
 
-        for(int row = 0; row < Board.boardSize; row++) {
+            case 'X':
 
-            for(int column = 0; column < Board.boardSize; column++) {
+                weight = hitWieght;
 
-                // increase score of the row based on the state of each space
-                if(board[row][column] == '~') {
+            break;
 
-                    currentRowScore+= unknownWeight;
+            case '*':
 
-                }
-
-                if(board[row][column] == 'X') {
-
-                    currentRowScore+= hitWieght;
-
-                }
-
-                if(board[row][column] == ' ') {
-
-                    currentRowScore+= missWieght;
-
-                }
-
-            }
-
-            rowScores[row] = currentRowScore;
-
-            // reset current score for next row
-            currentRowScore = 0;
+                weight = missWieght;
+            
+            break;
 
         }
 
-        return rowScores;
-        
-    }
+        return weight;
 
-    // get the scores of all the columns
-    public int[] getColumnScores(char[][] board) {
-
-        // score of the column currently be checked
-        int currentColumnScore = 0;
-
-        // list of the collumns's scores
-        int[] columnScores = new int[Board.boardSize];
-
-        for(int column = 0; column < Board.boardSize; column++) {
- 
-            for(int row = 0; row < Board.boardSize; row++) {
-
-                // increase score of the column based on the state of each space
-                if(board[row][column] == Board.unknownChar) {
-
-                    currentColumnScore+= unknownWeight;
-
-                }
-
-                if(board[row][column] == Board.hitChar) {
-
-                    currentColumnScore+= hitWieght;
-
-                }
-
-                if(board[row][column] == Board.missChar) {
-
-                    currentColumnScore+= missWieght;
-
-                }
-
-            }
-
-            columnScores[column] = currentColumnScore;
-
-            // reset current score for next column
-            currentColumnScore = 0;
-
-        }
-
-        return columnScores;
-        
     }
 
     // debug only function for seeing scoreBoard
-    public void printScoreBoard(int[][] scoreBoard) {
+    public void printScoreBoard() {
 
-        String[] rows = new String[Board.boardSize];
+        String[] rows = new String[boardSize];
 
         // loop throught all the rows
-        for(int i = 0; i < Board.boardSize; i++) {
+        for(int i = 0; i < boardSize; i++) {
 
             // create seed string
             String row = "";
 
             // loop through data array, adding X or O to seed string depending on wether space is occupied
             // with space to seperate
-            for(int j = 0; j < Board.boardSize; j++) {
+            for(int j = 0; j < boardSize; j++) {
 
                 String scoreString = "" + scoreBoard[i ][j];
 
@@ -236,7 +188,7 @@ public class AI {
         }
 
         // print out all the rows
-        for(int i = 0; i < Board.boardSize; i++) {
+        for(int i = 0; i < boardSize; i++) {
 
             System.out.println(rows[i]);
 
