@@ -4,11 +4,15 @@ public class Board {
     // this will be modified once during ship placement, then never again
     boolean[][] data;
 
-    // holds set of characters used to display the board, "~"" for unknown, " " for miss, "X" for hit
+    // holds set of characters used to display the board
     // this will be modified continuously throughout the game as the player/AI hits or misses
     char[][] display;
 
     public static int boardSize = 10;
+
+    public static char missChar = '*';
+    public static char hitChar = 'X';
+    public static char unknownChar = '~';
 
     public Board() {
 
@@ -23,7 +27,7 @@ public class Board {
 
                 data[i][j] = false;
 
-                display[i][j] = '~';
+                display[i][j] = unknownChar;
 
             }
 
@@ -125,11 +129,11 @@ public class Board {
             // otherwise it's a miss, update the board accordingly
             if(data[row][column]) {
 
-                display[row][column] = 'X';
+                display[row][column] = hitChar;
 
             } else {
 
-                display[row][column] = ' ';
+                display[row][column] = missChar;
 
             }
 
@@ -203,7 +207,7 @@ public class Board {
                 }
 
                 // if display has an X at that space, the player has hit it
-                if(display[i][j] == 'X') {
+                if(display[i][j] == hitChar) {
 
                     hits++;
 
@@ -227,7 +231,7 @@ public class Board {
         if(checkBounds(row, column)) {
 
             // checks if the guess is an unknown space
-            if(display[row][column] == '~') {
+            if(display[row][column] == unknownChar) {
 
                 isValid = true;
 
@@ -273,7 +277,7 @@ public class Board {
             // with space to seperate
             for(int j = 0; j < boardSize; j++) {
 
-                row = row + (data[i][j] ? 'X' : 'O') + " ";
+                row = row + (data[i][j] ? hitChar : 'O') + " ";
 
             }
 
@@ -319,7 +323,7 @@ public class Board {
 
                 data[i][j] = false;
 
-                display[i][j] = '~';
+                display[i][j] = unknownChar;
 
             }
 

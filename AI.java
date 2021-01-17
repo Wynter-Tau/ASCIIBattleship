@@ -3,6 +3,10 @@ import java.util.Random;
 public class AI {
 
     Random randomizer = new Random();
+    
+    int unknownWeight = 1;
+    int hitWieght = 3;
+    int missWieght = 0;
 
     // blank constructor
     public AI() {}
@@ -13,19 +17,101 @@ public class AI {
         // store board that the AI should be able to actually see
         char[][] board = boardObject.getDisplay();
 
+        int[][] scoreBoard = getScoreBoard(boardObject);
+
+        // find highest score
+        int highscore = -1;
+
+        for(int row = 0; row < Board.boardSize; row++) {
+
+            for(int column = 0; column < Board.boardSize; column++) {
+
+                if((scoreBoard[row][column] > highscore) && (boardObject.isValidGuess(row, column))) {
+
+                    highscore = scoreBoard[row][column];
+
+                }
+
+            }
+
+        }
+
+        // count number of high scores from valid spaces
+        int highscoreCount = 0;
+
+        for(int row = 0; row < Board.boardSize; row++) {
+
+            for(int column = 0; column < Board.boardSize; column++) {
+
+                if(scoreBoard[row][column] == highscore && (boardObject.isValidGuess(row, column))) {
+
+                    highscoreCount++;
+
+                }
+
+            }
+
+        }
+
+        // list of best possible moves, the ones with the highest possible score
+        int[][] bestMoves = new int[highscoreCount][2];
+
+        // secondary counter for keeping track of index in bestMoves
+        int secondaryCounter = 0;
+
+        // find all of the best moves, excluding the invalid ones
+        for(int row = 0; row < Board.boardSize; row++) {
+
+            for(int column = 0; column < Board.boardSize; column++) {
+
+                if((scoreBoard[row][column] == highscore) && (boardObject.isValidGuess(row, column))) {
+
+                    int[] coordinates = {row, column};
+
+                    bestMoves[secondaryCounter] = coordinates;
+
+                    secondaryCounter++;
+
+                }
+
+            }
+
+        }
+        
+        int[] bestMove = bestMoves[randomizer.nextInt(bestMoves.length)];
+
+        return bestMove;
+
+    }
+
+    public int[][] getScoreBoard(Board boardObject) {
+
+        char[][] board = boardObject.getDisplay();    
+        
         int[] rowScores = getRowScores(board);
         int[] columnScores = getColumnScores(board);
 
-        int[] bestRows = findHighestScoringIndexes(rowScores);
-        int[] bestColumns = findHighestScoringIndexes(columnScores);
+        // grid of scores for later use
+        int[][] scoreBoard = new int[Board.boardSize][Board.boardSize];
 
-        int[] moveCoordinates = new int[2];
+        // fill scoreBoard with scores of each square
+        for(int row = 0; row < Board.boardSize; row++) {
 
-        // randomly choose from the best indexes
-        moveCoordinates[0] = bestRows[randomizer.nextInt(bestRows.length)];
-        moveCoordinates[1] = bestColumns[randomizer.nextInt(bestColumns.length)];
+            for(int column = 0; column < Board.boardSize; column++) {
 
-        return moveCoordinates;
+                if(!boardObject.isValidGuess(row, column)) {
+
+                    scoreBoard[row][column] = 0;
+
+                }
+                
+                scoreBoard[row][column] = rowScores[row] + columnScores[column];
+
+            }
+
+        }
+        
+        return scoreBoard;
 
     }
 
@@ -45,19 +131,19 @@ public class AI {
                 // increase score of the row based on the state of each space
                 if(board[row][column] == '~') {
 
-                    currentRowScore+= 1;
+                    currentRowScore+= unknownWeight;
 
                 }
 
                 if(board[row][column] == 'X') {
 
-                    currentRowScore+= 3;
+                    currentRowScore+= hitWieght;
 
                 }
 
                 if(board[row][column] == ' ') {
 
-                    currentRowScore+= 0;
+                    currentRowScore+= missWieght;
 
                 }
 
@@ -88,21 +174,21 @@ public class AI {
             for(int row = 0; row < Board.boardSize; row++) {
 
                 // increase score of the column based on the state of each space
-                if(board[row][column] == '~') {
+                if(board[row][column] == Board.unknownChar) {
 
-                    currentColumnScore+= 1;
-
-                }
-
-                if(board[row][column] == 'X') {
-
-                    currentColumnScore+= 3;
+                    currentColumnScore+= unknownWeight;
 
                 }
 
-                if(board[row][column] == ' ') {
+                if(board[row][column] == Board.hitChar) {
 
-                    currentColumnScore+= 0;
+                    currentColumnScore+= hitWieght;
+
+                }
+
+                if(board[row][column] == Board.missChar) {
+
+                    currentColumnScore+= missWieght;
 
                 }
 
@@ -119,53 +205,36 @@ public class AI {
         
     }
 
-    // find the largest scores out of the list, and the indexes that correlate to them
-    public int[] findHighestScoringIndexes(int[] scores){
-    
-        int highestScore = -1;
+    // debug only function for seeing scoreBoard
+    public void printScoreBoard(int[][] scoreBoard) {
 
-        // idenitify the highest score
+        String[] rows = new String[Board.boardSize];
+
+        // loop throught all the rows
         for(int i = 0; i < Board.boardSize; i++) {
 
-            if(scores[i] > highestScore) {
+            // create seed string
+            String row = "";
 
-                highestScore = scores[i];
+            // loop through data array, adding X or O to seed string depending on wether space is occupied
+            // with space to seperate
+            for(int j = 0; j < Board.boardSize; j++) {
+
+                row = row + scoreBoard[i][j] + " ";
 
             }
 
+            // add completed string to array
+            rows[i] = row;
+
         }
 
-        int highScoreCount = 0;
-
-        // count number of high scores
+        // print out all the rows
         for(int i = 0; i < Board.boardSize; i++) {
 
-            if(scores[i] == highestScore) {
-
-                highScoreCount++;
-
-            }
+            System.out.println(rows[i]);
 
         }
-
-        // list of highest scoring indexes, will be final output once filled
-        int[] highestScoringIndexes = new int[highScoreCount];
-
-        // secondary counter for keeping track of the index in highestScoringIndexes
-        int secondaryCounter = 0;
-
-        for(int i = 0; i < Board.boardSize; i++) {
-
-            if(scores[i] == highestScore) {
-
-                highestScoringIndexes[secondaryCounter] = i;
-                secondaryCounter++;
-
-            }
-
-        }
-
-        return highestScoringIndexes;
 
     }
 

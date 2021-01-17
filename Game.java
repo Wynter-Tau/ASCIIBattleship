@@ -5,7 +5,13 @@ public class Game {
 
     Scanner input = new Scanner(System.in);
 
-    Board board = new Board();    
+    // board the player sees and plays on
+    Board playerBoard = new Board();   
+    
+    // board the AI sees and plays on
+    Board AIBoard = new Board();
+
+    AI AIPlayer = new AI();
 
     Random randomizer = new Random();
 
@@ -14,15 +20,35 @@ public class Game {
 
     public void run() {
 
-        placeRandomShips();
+        placeRandomShips(AIBoard);
+        placeRandomShips(playerBoard);
 
         // primary game loop
-        while(!board.detectVictory()) {
+        while(!playerBoard.detectVictory() && !AIBoard.detectVictory()) {
 
             // space out from previous loop
             System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 
-            board.printBoard();
+            int[] AIMove = AIPlayer.findMove(AIBoard);
+
+            AIBoard.play(AIMove[0], AIMove[1]);
+
+            System.out.println("AI played at: " + numToCha(AIMove[0]) + (AIMove[1] + 1) + "\nAI Board:");
+
+            AIBoard.printBoard();
+
+            //debug line
+            System.out.println();
+
+            // debugg line
+            AIPlayer.printScoreBoard(AIPlayer.getScoreBoard(AIBoard));
+
+            //debug line
+            System.out.println();
+
+            System.out.println("\nYour Board: ");
+
+            playerBoard.printBoard();
 
             System.out.println("Input your move");
 
@@ -48,7 +74,7 @@ public class Game {
             int column = Integer.parseInt(numString);
 
             // check that the move is valid, and once it is, play it
-            while(!board.play(charToNum(row), column - 1)) {
+            while(!playerBoard.play(charToNum(row), column - 1)) {
 
                 System.out.println("Invalid, your move was either out of bounds or already played, choose again");
 
@@ -74,9 +100,13 @@ public class Game {
 
         }
 
-        board.printBoard();
+        AIBoard.printBoard();
 
-        System.out.println("you won!");
+        playerBoard.printBoard();
+
+        String victor = ((playerBoard.detectVictory()) ? "you":"AI");
+
+        System.out.println(victor + " won!");
 
     }
 
@@ -128,7 +158,7 @@ public class Game {
 
     }
 
-    public void placeRandomShips() {
+    public void placeRandomShips(Board board) {
 
         // record of which ships have been placed, in order:
         // 5 ship, 4 ship, 3 ship, 3 ship, 2 ship
@@ -143,8 +173,8 @@ public class Game {
 
                 boolean isVertical = randomizer.nextInt(2) == 0;
 
-                int row = randomizer.nextInt(board.boardSize);
-                int column = randomizer.nextInt(board.boardSize);
+                int row = randomizer.nextInt(Board.boardSize);
+                int column = randomizer.nextInt(Board.boardSize);
 
                 while(!board.placeShip(lengths[i], isVertical, row, column)) {
 
@@ -165,9 +195,9 @@ public class Game {
 
     public boolean isLetter(char cha) {
 
-        char[] letters = new char[board.boardSize];
+        char[] letters = new char[Board.boardSize];
 
-        for(int i = 0; i < board.boardSize; i++) {
+        for(int i = 0; i < Board.boardSize; i++) {
 
             letters[i] = numToCha(i);
 
